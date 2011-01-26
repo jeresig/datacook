@@ -1,0 +1,45 @@
+Sites:
+ - All Recipe
+ - Food.com
+ - Foodnetwork.com
+
+Major Chef Recipes:
+ - Alton Brown
+   http://www.foodnetwork.com/search/delegate.do?Nr=Record%20Type:Result&N=501&fnSearchString=alton%20brown
+ - Bobby Flay
+ - Emeral?
+ - Paula
+
+The Perfect X
+ - Pork Dumpling
+ - Anything
+
+Kitchen Gear
+ - For cooking Chinese
+ - For cooking Alton Brown food
+
+Techniques
+
+Baking Heats
+
+Correlation between foods and nutrition information
+
+Fun Articles:
+ - Apple Pie - Rating and Calories
+ - The Optimal Fruit Cake
+
+
+Apple Pie
+ - Correlation Between Rating and Calories
+ - Equipment (Avg. Oven Heat) / Gear
+ - Techniques
+ - Optimal Ingredients
+ - Comparison with Celebrity Pies
+   - More/less calories
+	 - Different techniques used
+
+Data:
+ - Ingredients (frequency)
+ - Equipment
+ - Oven temps
+ - Nutrional Info
