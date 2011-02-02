@@ -20,7 +20,7 @@ my $find_ingredient = qr{
 		(?:\([^\)]+\)\s)?
 
 		# The units themselves
-		(?:tablespoons?|tbsps?|tsp|teaspoons?|quart|cups?|pinch|pinches|pounds?|ounces?|oz|cans?|gallons?|bottles?|packages?|envelopes?|inch|inches|whole|cloves?|heads?|slices?|thin slices?|cubes?|heads?|pieces?|bunch|bunches|dash|dashes|sprigs?|leaf|leaves|head|box|recipe|lbs?|g|kg|each|stars|cakes?|ml|l|fluid\sounces|cm|stalks?|jars?|loaf|loaves|liters?|bags?|drops?)?
+		(?:tablespoons?|tbsps?|tsp|teaspoons?|quart|cups?|pinch|pinches|pounds?|ounces?|oz|cans?|gallons?|bottles?|packages?|pkg|envelopes?|inch|inches|whole|cloves?|heads?|slices?|thin slices?|cubes?|heads?|pieces?|bunch|bunches|dash|dashes|sprigs?|leaf|leaves|head|box|recipe|lbs?|g|kg|each|stars|cakes?|ml|l|fluid\sounces|cm|stalks?|jars?|loaf|loaves|liters?|bags?|drops?)?
 
 		# Unit suffix (sometimes used as the primary unit)
 		$unit_suffix?
@@ -37,7 +37,7 @@ my $find_technique = qr{
 		)?
 
 		# The action itself
-		(?:chopped|diced|sliced|peeled|deveined|reconstituted|beaten|drained|cubed|cooked|minced|halved|divided|undrained|cut|shredded|crushed|julienned|pitted|boiling|boiled|rinsed|cored|grated|melted|slivered|diagonally|soaked|pat dry|mixed|mashed|dissolved|torn|picked|trimmed|shelled|salted|packed|softened|seeded|cleaned|scaled|\w+\s+removed|ground|zested|stemmed|defrosted|toasted|roasted|quartered|flaked|broken\s+up|broken|crumbled|thawed|smashed|deep\sfrying)
+		(?:chopped|diced|sliced|peeled|deveined|reconstituted|beaten|drained|cubed|cooked|minced|halved|divided|undrained|cut|shredded|crushed|julienned|pitted|boiling|boiled|rinsed|cored|grated|melted|slivered|diagonally|soaked|pat dry|mixed|mashed|dissolved|torn|picked|trimmed|shelled|salted|packed|softened|seeded|cleaned|scaled|\w+\s+removed|ground|zested|stemmed|defrosted|toasted|roasted|quartered|flaked|broken\s+up|broken|crumbled|thawed|smashed|deep\sfrying|snipped)
 
 		# The action suffix (for example: sliced thinly)
 		(?:
@@ -65,11 +65,17 @@ my %extract = (
 		#ingredients => '(<div class="ingredients".*?</div>)',
 		#ingredient => '<li.*?>(.*?)</li>'
 	#},
-	"www.food.com" => {
-		files => 'recipe/*',
-		title => '<h2 class="fn">\s*(.*?)\s*<',
-		ingredients => '(<div class="pod ingredients clrfix".*?<p><strong>)',
-		ingredient => '<li.*?>(.*?)</li>'
+	#"www.food.com" => {
+		#files => 'recipe/*',
+		#title => '<h2 class="fn">\s*(.*?)\s*<',
+		#ingredients => '(<div class="pod ingredients clrfix".*?<p><strong>)',
+		#ingredient => '<li.*?>(.*?)</li>'
+	#},
+	"www.recipe.com" => {
+		files => '*/index.html',
+		title => '<title>(.*?)<',
+		ingredients => '(<div class="recipedetailsmore".*?<div class="ACThead3">Directions)',
+		ingredient => '<span.*?>(.*?)</span>'
 	}
 );
 
@@ -173,7 +179,8 @@ sub clean {
 	my $str = shift;
 
 	$str =~ s/&nbsp;/ /g;
-	$str =~ s/&#\d+;//g;
+	$str =~ s/&#?[\w\d]+;//g;
+	$str =~ s/[*.]//g;
 	$str =~ s/(\d+)\s*-\s*(\d+)/\1-\2/gs;
 	$str =~ s/^\s*|\s*$//gs;
 	$str =~ s/[\s,]+/ /gs;
