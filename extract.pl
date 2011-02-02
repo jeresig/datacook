@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Data::Dumper;
+use JSON;
 
 my $term = $ARGV[0];
 my $clean_term = $term;
@@ -59,24 +59,24 @@ my $find_technique = qr{
 my $find_size = '(small|large|medium)';
 
 my %extract = (
-	#"allrecipes.com" => {
-		#files => 'Recipe/*/Detail.aspx',
-		#title => '<title>\s*(.*?) Recipe',
-		#ingredients => '(<div class="ingredients".*?</div>)',
-		#ingredient => '<li.*?>(.*?)</li>'
-	#},
-	#"www.food.com" => {
-		#files => 'recipe/*',
-		#title => '<h2 class="fn">\s*(.*?)\s*<',
-		#ingredients => '(<div class="pod ingredients clrfix".*?<p><strong>)',
-		#ingredient => '<li.*?>(.*?)</li>'
-	#},
-	#"www.recipe.com" => {
-		#files => '*/index.html',
-		#title => '<title>(.*?)<',
-		#ingredients => '(<div class="recipedetailsmore".*?<div class="ACThead3">Directions)',
-		#ingredient => '<span.*?>(.*?)</span>'
-	#},
+	"allrecipes.com" => {
+		files => 'Recipe/*/Detail.aspx',
+		title => '<title>\s*(.*?) Recipe',
+		ingredients => '(<div class="ingredients".*?</div>)',
+		ingredient => '<li.*?>(.*?)</li>'
+	},
+	"www.food.com" => {
+		files => 'recipe/*',
+		title => '<h2 class="fn">\s*(.*?)\s*<',
+		ingredients => '(<div class="pod ingredients clrfix".*?<p><strong>)',
+		ingredient => '<li.*?>(.*?)</li>'
+	},
+	"www.recipe.com" => {
+		files => '*/index.html',
+		title => '<title>(.*?)<',
+		ingredients => '(<div class="recipedetailsmore".*?<div class="ACThead3">Directions)',
+		ingredient => '<span.*?>(.*?)</span>'
+	},
 	"chinesefood.about.com" => {
 		files => 'od/*/r/*.htm',
 		title => '<title>(.*?)<',
@@ -85,12 +85,10 @@ my %extract = (
 	},
 );
 
-my $recipes = {};
+my @recipes = ();
 
 foreach my $site ( sort keys %extract ) {
 	if ( -d $site ) {
-		$recipes->{ $site } = [];
-
 		my $opt = $extract{ $site };
 
 		foreach my $name ( glob( $site . "/" . $opt->{files} ) ) {
@@ -123,16 +121,12 @@ foreach my $site ( sort keys %extract ) {
 				}
 			}
 
-			#print Dumper( $recipe );
-
-			push( @{ $recipes->{ $site } }, $recipe );
+			push( @recipes, $recipe );
 		}
 	}
 }
 
-$Data::Dumper::Indent = 1;
-
-print Dumper( $recipes );
+print encode_json \@recipes;
 
 sub get_ingredient {
 	my $ingredient = clean( lc($_[0]) );
