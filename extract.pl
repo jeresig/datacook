@@ -37,7 +37,7 @@ my $find_technique = qr{
 		)?
 
 		# The action itself
-		(?:chopped|diced|sliced|peeled|deveined|reconstituted|beaten|drained|cubed|cooked|minced|halved|divided|undrained|cut|shredded|crushed|julienned|pitted|boiling|boiled|rinsed|cored|grated|melted|slivered|diagonally|soaked|pat dry|mixed|mashed|dissolved|torn|picked|trimmed|shelled|salted|packed|softened|seeded|cleaned|scaled|\w+\s+removed|ground|zested|stemmed|defrosted|toasted|roasted|quartered|flaked|broken\s+up|broken|crumbled|thawed|smashed|deep\sfrying|snipped)
+		(?:chopped|diced|sliced|peeled|deveined|reconstituted|beaten|drained|cubed|cooked|minced|halved|divided|undrained|cut|shredded|crushed|julienned|pitted|boiling|boiled|rinsed|cored|grated|melted|slivered|diagonally|soaked|pat dry|mixed|mashed|dissolved|torn|picked|trimmed|shelled|salted|packed|softened|seeded|cleaned|scaled|\w+\s+removed|\w+\s+left\sin|ground|zested|stemmed|defrosted|toasted|roasted|quartered|flaked|broken\s+up|broken|crumbled|thawed|smashed|deep\sfrying|snipped|washed)
 
 		# The action suffix (for example: sliced thinly)
 		(?:
@@ -71,12 +71,18 @@ my %extract = (
 		#ingredients => '(<div class="pod ingredients clrfix".*?<p><strong>)',
 		#ingredient => '<li.*?>(.*?)</li>'
 	#},
-	"www.recipe.com" => {
-		files => '*/index.html',
+	#"www.recipe.com" => {
+		#files => '*/index.html',
+		#title => '<title>(.*?)<',
+		#ingredients => '(<div class="recipedetailsmore".*?<div class="ACThead3">Directions)',
+		#ingredient => '<span.*?>(.*?)</span>'
+	#},
+	"chinesefood.about.com" => {
+		files => 'od/*/r/*.htm',
 		title => '<title>(.*?)<',
-		ingredients => '(<div class="recipedetailsmore".*?<div class="ACThead3">Directions)',
-		ingredient => '<span.*?>(.*?)</span>'
-	}
+		ingredients => '(<h3 id="rI">Ingredients:<\/h3>.*?<\/ul>)',
+		ingredient => '<li class="ingredient">(.*?)<\/li>'
+	},
 );
 
 my $recipes = {};
