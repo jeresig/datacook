@@ -9,18 +9,21 @@ $clean_term =~ s/ /-/g;
 
 chdir( $clean_term );
 
-my $unit_suffix = qr/(?:piece|\w+\sneeded|(?:for|to|made)[^\(\)]+)/;
+my $unit_suffix = qr/(?:piece|\w+\sneeded|(?:for|to|made)\s+[^\(\)]+)/;
 
 my $find_ingredient = qr{
-	(
+	(^
+		# Possible prefix
+		(?:about|any|an|a)?
+
 		# The digits to extract (supports: 1, 1 1/4, 1-2)
-		^[0-9\/ -]+
+		(?:[0-9\/ -]+|any|an|a)-?
 
 		# Any sort of qualifier in parens (for example: 1 (10oz can) green beans)
 		(?:\([^\)]+\)\s)?
 
 		# The units themselves
-		(?:tablespoons?|tbsps?|tsp|teaspoons?|quart|cups?|pinch|pinches|pounds?|ounces?|oz|cans?|gallons?|bottles?|packages?|pkg|envelopes?|inch|inches|whole|cloves?|heads?|slices?|thin slices?|cubes?|heads?|pieces?|bunch|bunches|dash|dashes|sprigs?|leaf|leaves|head|box|recipe|lbs?|g|kg|each|stars|cakes?|ml|l|fluid\sounces|cm|stalks?|jars?|loaf|loaves|liters?|bags?|drops?)?
+		(?:tablespoons?|tbsps?|tsp|teaspoons?|quart|cups?|pinch|pinches|pounds?|-?ounces?|oz|cans?|gallons?|bottles?|packages?|pkg|envelopes?|inch|inches|whole|cloves?|heads?|slices?|thin slices?|cubes?|heads?|pieces?|bunch|bunches|dash|dashes|sprigs?|leaf|leaves|head|box|recipe|lbs?|g|kg|each|stars|cakes?|ml|l|fluid\sounces|cm|stalks?|jars?|loaf|loaves|liters?|bags?|drops?|quarts?|tb|tbs|%|percent)?
 
 		# Unit suffix (sometimes used as the primary unit)
 		$unit_suffix?
@@ -37,7 +40,10 @@ my $find_technique = qr{
 		)?
 
 		# The action itself
-		(?:chopped|diced|sliced|peeled|deveined|reconstituted|beaten|drained|cubed|cooked|minced|halved|divided|undrained|cut|shredded|crushed|julienned|pitted|boiling|boiled|rinsed|cored|grated|melted|slivered|diagonally|soaked|pat dry|mixed|mashed|dissolved|torn|picked|trimmed|shelled|salted|packed|softened|seeded|cleaned|scaled|\w+\s+removed|\w+\s+left\sin|ground|zested|stemmed|defrosted|toasted|roasted|quartered|flaked|broken\s+up|broken|crumbled|thawed|smashed|deep\sfrying|snipped|washed)
+		(?:chopped|diced|sliced|peeled|deveined|reconstituted|beaten|drained|cubed|cooked|minced|halved|divided|undrained|cut|shredded|crushed|julienned|pitted|boiling|boiled|rinsed|cored|grated|melted|slivered|diagonally|soaked|pat dry|mixed|mashed|dissolved|torn|picked|trimmed|shelled|salted|packed|softened|seeded|cleaned|scaled|\w+\s+removed|\w+\s+left\sin|zested|stemmed|defrosted|toasted|roasted|quartered|flaked|broken\s+up|broken|crumbled|thawed|smashed|deep\sfrying|snipped|washed)
+
+		# Additional unit information
+		(?:-\w+)?
 
 		# The action suffix (for example: sliced thinly)
 		(?:
@@ -126,7 +132,9 @@ foreach my $site ( sort keys %extract ) {
 	}
 }
 
-print encode_json \@recipes;
+open( F, ">data.json" );
+print F encode_json \@recipes;
+close( F );
 
 sub get_ingredient {
 	my $ingredient = clean( lc($_[0]) );
@@ -134,11 +142,13 @@ sub get_ingredient {
 	my $otherData;
 
 	if ( $ingredient && $ingredient !~ /:$/ ) {
+		my $data = {};
+
+		$data->{orig} = $ingredient;
+
 		if ( $ingredient !~ /\(/ && $ingredient =~ s/ or (\d+.*)$//i ) {
 			( $otherName, $otherData ) = get_ingredient( $1 );
 		}
-
-		my $data = {};
 
 		if ( $ingredient =~ s!$find_size!!i ) {
 			$data->{size} = $1;
@@ -180,11 +190,11 @@ sub clean {
 
 	$str =~ s/&nbsp;/ /g;
 	$str =~ s/&#?[\w\d]+;//g;
-	$str =~ s/[*.]//g;
+	$str =~ s/[*."]//g;
 	$str =~ s/(\d+)\s*-\s*(\d+)/\1-\2/gs;
 	$str =~ s/^\s*|\s*$//gs;
-	$str =~ s/[\s,]+/ /gs;
 	$str =~ s/<[^>]+>//g;
+	$str =~ s/[\s,]+/ /gs;
 
 	return $str;
 }
